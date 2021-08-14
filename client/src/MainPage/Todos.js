@@ -16,12 +16,12 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
 import { IconButton, Tooltip } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 
 //icons
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const Todos = (props) => {
    const [todos, setTodos] = useState(null);
@@ -63,7 +63,7 @@ const Todos = (props) => {
                         />
                         <Tooltip title='add todo'>
                            <span>
-                           <IconButton disabled={desc === '' ? true : false} color="secondary" aria-label="upload picture" component="span"
+                           <IconButton disabled={desc === '' ? true : false} color="secondary" component="span"
                               onClick={()=>{
                                  let reqbody = {
                                     description: desc
@@ -86,7 +86,6 @@ const Todos = (props) => {
                   </TableRow>
                </TableHead>
                <TableBody>
-
                   {todos !== null ?
                      todos.map((todo) => (
                         <TableRow key={todo._id}>
@@ -94,7 +93,22 @@ const Todos = (props) => {
                               {todo.description}
                            </TableCell>
                            <TableCell align="right">
-                              <Button>view</Button>
+                              <Tooltip title='delete todo'>
+                                 <IconButton color="secondary" component="span"
+                                    onClick={()=>{
+                                       axios.delete(axiosDefault.apiURL+'/api/todos/delete/'+todo._id, {crossdomain: true})
+                                       .then(function (res) {
+                                          console.log(res)
+                                          setTodos(null)
+                                       })
+                                       .catch(function (err) {
+                                          console.log(err)
+                                       }) 
+                                    }}
+                                 >
+                                    <DeleteIcon />
+                                 </IconButton>
+                              </Tooltip>
                            </TableCell>
                         </TableRow>
                      ))
