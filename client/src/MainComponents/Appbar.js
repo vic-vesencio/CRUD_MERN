@@ -58,7 +58,7 @@ export default React.memo(({centerTitle}) => {
 
    return (
       <React.Fragment>
-         <AppBar position="static" style={{backgroundColor: '#262636'}}>
+         <AppBar position="static" color="primary">
             <Toolbar variant="dense">
                <Box className={classes.menu}>
                   <IconButton edge="start" color="inherit" aria-label="menu"
