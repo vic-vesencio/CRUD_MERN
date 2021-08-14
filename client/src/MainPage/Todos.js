@@ -16,16 +16,49 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { IconButton, Tooltip } from '@material-ui/core';
+import { IconButton, Tooltip, Button } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
+import { makeStyles } from '@material-ui/core/styles';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
 
 //icons
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
+
+const useStyles = makeStyles((theme) => ({
+   modal: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+   },
+   paper: {
+      backgroundColor: theme.palette.background.paper,
+      border: '2px solid #000',
+      boxShadow: theme.shadows[5],
+      padding: theme.spacing(2, 4, 3),
+   },
+}));
+ 
 
 const Todos = (props) => {
    const [todos, setTodos] = useState(null);
    const [desc, setDesc] = useState('');
+   const classes = useStyles();
+   const [open, setOpen] = React.useState(false);
+   const [selectedID, selectID] = useState(null);
+   const [newDesc, setNewDesc] = useState('');
+ 
+   const handleOpen = () => {
+     setOpen(true);
+   };
+ 
+   const handleClose = () => {
+     setOpen(false);
+   };
+
    useEffect(()=>{
       if(todos === null){
          axios.get(axiosDefault.apiURL+'/api/todos/get-all/', {crossdomain: true})
@@ -71,6 +104,7 @@ const Todos = (props) => {
                                  axios.post(axiosDefault.apiURL+'/api/todos/add', reqbody, {crossdomain: true})
                                  .then(function (res) {
                                     console.log(res)
+                                    setDesc('');
                                     setTodos(null)
                                  })
                                  .catch(function (err) {
@@ -109,6 +143,16 @@ const Todos = (props) => {
                                     <DeleteIcon />
                                  </IconButton>
                               </Tooltip>
+                              <Tooltip title='edit todo'>
+                                 <IconButton color="secondary" component="span"
+                                    onClick={()=>{
+                                       selectID(todo._id);
+                                       handleOpen();
+                                    }}
+                                 >
+                                    <EditIcon />
+                                 </IconButton>
+                              </Tooltip>
                            </TableCell>
                         </TableRow>
                      ))
@@ -123,6 +167,49 @@ const Todos = (props) => {
                </Table>
             </TableContainer>
          </Container>
+         <Modal
+            aria-labelledby="transition-modal-title"
+            aria-describedby="transition-modal-description"
+            className={classes.modal}
+            open={open}
+            onClose={handleClose}
+            closeAfterTransition
+            BackdropComponent={Backdrop}
+            BackdropProps={{
+               timeout: 500,
+            }}
+         >
+            <Fade in={open}>
+               <div className={classes.paper}>
+                  <p>Enter new description</p>
+                  <TextField
+                     style={{width: '100%'}}
+                     value={newDesc}
+                     onChange={e=>setNewDesc(e.target.value)}
+                     label="edit description"
+                     margin="dense"
+                     variant="outlined"
+                  />
+                  <Button color='secondary'
+                     onClick={()=>{
+                        let reqbody ={
+                           description: newDesc
+                        }
+                        axios.put(axiosDefault.apiURL+'/api/todos/update/'+selectedID, reqbody,{crossdomain: true})
+                        .then(function (res) {
+                           setTodos(null)
+                           console.log(res)
+                        })
+                        .catch(function (err) {
+                           console.log(err)
+                        }) 
+                        handleClose();
+                     }}
+                  >save</Button>
+                  <Button onClick={()=>handleClose()} color='secondary'>close</Button>
+               </div>
+            </Fade>
+         </Modal>
       </div>
    );
 }

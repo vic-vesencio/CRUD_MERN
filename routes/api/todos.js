@@ -37,7 +37,8 @@ router.delete('/delete/:id', (req, res) => {
 //@desc update todo
 router.put('/update/:id', (req, res) => {
 	Todo.findOneAndUpdate({_id: req.params.id}, {description: req.body.description})
-		.catch(err => res.status(404).json({ success: false }));
+	.then(todo => res.json(todo))
+	.catch(err => res.status(404).json({ success: false }));
 });
 
 module.exports = router;
