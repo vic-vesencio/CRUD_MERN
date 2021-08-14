@@ -6,7 +6,7 @@ const Todo = require('../../models/Todo');
 
 //@route GET todo
 //@desc Get All todos
-router.get('/', (req, res) => {
+router.get('/get-all', (req, res) => {
 	Todo.find()
 		.sort({ date: 1})
       .then(todos => res.json(todos));
@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 
 //@route POST todos
 //@desc add new todo
-router.post('/', async(req, res) => {
+router.post('/add', async(req, res) => {
 	const newTodo = new Todo({
 		description: req.body.description,
 	});
@@ -26,9 +26,17 @@ router.post('/', async(req, res) => {
 
 //@route DELETE todo:id
 //@desc delete todo
-router.delete('/:id', (req, res) => {
+router.delete('/delete/:id', (req, res) => {
 	Todo.findById(req.params.id)
 		.then(todos => todos.remove().then(() => res.json( {success: true })))
+		.catch(err => res.status(404).json({ success: false }));
+});
+
+
+//@route UPDATE todo:id
+//@desc update todo
+router.put('/update/:id', (req, res) => {
+	Todo.findOneAndUpdate({_id: req.params.id}, {description: req.body.description})
 		.catch(err => res.status(404).json({ success: false }));
 });
 
